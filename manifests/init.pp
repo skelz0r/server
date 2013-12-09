@@ -6,13 +6,14 @@ Exec {
 # Fill the host name here
 node 'vagrant-ubuntu-raring-64' {
   $ruby_version   = '2.0.0-p353'
+  $passenger_version = '4.0.27'
   $user           = 'skelz0r'
   $zsh_bin_path   = "/usr/bin/zsh"
 
   $user_home      = "/home/${user}"
 
   package {
-    ["silversearcher-ag", "tmux", "htop", "git", "vim", "tree", "zsh"]:
+    ["tmux", "htop", "git", "vim", "tree", "zsh"]:
       ensure => present;
   }
 
@@ -25,7 +26,10 @@ node 'vagrant-ubuntu-raring-64' {
 
   include rvm
   include apache
-  include rvm::passenger::apache
+  class { 'rvm::passenger::apache':
+    version      => $passenger_version,
+    ruby_version => $ruby_version
+  }
 
   rvm_system_ruby {
     $ruby_version:
@@ -45,16 +49,17 @@ node 'vagrant-ubuntu-raring-64' {
     shell      => $zsh_bin_path,
     groups     => ['rvm', 'www-data'],
     password   => '',
-    require => [Rvm_system_ruby[$ruby_version], Package["zsh"], Apache];
+    require => [Rvm_system_ruby[$ruby_version], Package["zsh"], Class['apache']];
   }
 
-  dotfiles_for { $user:
+  dotfiles_for { "${user}":
     user => $user,
-    path => $user_home
+    user_path => $user_home,
+    require => User[$user];
   }
 
   dotfiles_for { 'root':
     user => 'root',
-    path => '/root'
+    user_path => '/root'
   }
 }
