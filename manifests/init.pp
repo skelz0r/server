@@ -9,6 +9,7 @@ node 'vagrant-ubuntu-raring-64' {
   $passenger_version = '4.0.27'
   $user           = 'skelz0r'
   $zsh_bin_path   = "/usr/bin/zsh"
+  $hostname       = 'skelz0r.fr'
 
   $user_home      = "/home/${user}"
 
@@ -35,6 +36,18 @@ node 'vagrant-ubuntu-raring-64' {
     $ruby_version:
       ensure => 'present',
       default_use => true;
+  }
+
+  class {
+    'vhost_rails':
+      hostname => $hostname,
+      require => Class['rvm::passenger::apache'];
+  }
+
+  class {
+    'rvm::passenger::apache':
+      version => '3.0.11',
+      ruby_version => 'ruby-1.9.2-p290';
   }
 
   user { 'root':

@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+  ServerName <%= @hostname %>
+  DocumentRoot /var/www/current/public
+  RailsEnv "development"
+  
+  <Directory /var/www/current/public>
+    Allow from all
+  </Directory>
+</VirtualHost>
