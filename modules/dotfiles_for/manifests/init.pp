@@ -1,5 +1,6 @@
 define dotfiles_for($user, $user_path) {
   $repo_path = "${user_path}/dotfiles"
+
   vcsrepo { $repo_path:
     ensure => present,
     provider => git,

@@ -5,13 +5,13 @@ Exec {
 
 # Fill the host name here
 node 'vagrant-ubuntu-raring-64' {
-  $ruby_version   = '2.0.0-p353'
+  $ruby_version      = '2.0.0-p353'
   $passenger_version = '4.0.27'
-  $user           = 'skelz0r'
-  $zsh_bin_path   = "/usr/bin/zsh"
-  $hostname       = 'skelz0r.fr'
+  $user              = 'skelz0r'
+  $zsh_bin_path      = "/usr/bin/zsh"
+  $hostname          = 'skelz0r.fr'
 
-  $user_home      = "/home/${user}"
+  $user_home         = "/home/${user}"
 
   package {
     ["tmux", "htop", "git", "vim", "tree", "zsh"]:
@@ -26,11 +26,6 @@ node 'vagrant-ubuntu-raring-64' {
   }
 
   include rvm
-  include apache
-  class { 'rvm::passenger::apache':
-    version      => $passenger_version,
-    ruby_version => $ruby_version
-  }
 
   rvm_system_ruby {
     $ruby_version:
@@ -38,16 +33,15 @@ node 'vagrant-ubuntu-raring-64' {
       default_use => true;
   }
 
+  class { 'rvm::passenger::apache':
+    version      => $passenger_version,
+    ruby_version => $ruby_version
+  }
+
   class {
     'vhost_rails':
       hostname => $hostname,
       require => Class['rvm::passenger::apache'];
-  }
-
-  class {
-    'rvm::passenger::apache':
-      version => '3.0.11',
-      ruby_version => 'ruby-1.9.2-p290';
   }
 
   user { 'root':
@@ -62,7 +56,7 @@ node 'vagrant-ubuntu-raring-64' {
     shell      => $zsh_bin_path,
     groups     => ['rvm', 'www-data'],
     password   => '',
-    require => [Rvm_system_ruby[$ruby_version], Package["zsh"], Class['apache']];
+    require => [Rvm_system_ruby[$ruby_version], Package["zsh"]];
   }
 
   dotfiles_for { "${user}":
